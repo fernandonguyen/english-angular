@@ -11,12 +11,12 @@ const API_URL = environment.apiUrl;
   providedIn: 'root'
 })
 export class AuthenticationService {
-  private currentUserSubject: BehaviorSubject<UserToken>;
-  public currentUser: Observable<UserToken>;
+  private currentUserSubject: BehaviorSubject<User>;
+  public currentUser: Observable<User>;
   update = new EventEmitter<string>();
 
   constructor(private http: HttpClient) {
-    this.currentUserSubject = new BehaviorSubject<UserToken>(JSON.parse(localStorage.getItem('user')));
+    this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')));
     this.currentUser = this.currentUserSubject.asObservable();
   }
 
@@ -25,9 +25,9 @@ export class AuthenticationService {
   }
 
   login(username: string, password: string) {
-    return this.http.post<any>(API_URL + '/login', {username, password})
+    return this.http.post<any>(API_URL + '/users/authenticate', {username, password})
         .pipe(map(user => {
-          localStorage.setItem('user', JSON.stringify(user));
+          localStorage.setItem('currentUser', JSON.stringify(user));
           this.currentUserSubject.next(user);
           this.update.emit('login');
           return user;
@@ -35,7 +35,7 @@ export class AuthenticationService {
   }
 
   logout() {
-    localStorage.removeItem('user');
+    localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
   }
 }

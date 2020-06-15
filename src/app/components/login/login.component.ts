@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit {
     submitted = false;
     currentUser: UserToken;
     hasRoleAdmin = false;
+    error = '';
 
     constructor(private activatedRoute: ActivatedRoute, private router: Router, private authenticateService: AuthenticationService) {
         this.authenticateService.currentUser.subscribe(value => this.currentUser = value);
@@ -78,42 +79,31 @@ export class LoginComponent implements OnInit {
             .subscribe(
                 data => {
                     localStorage.setItem('ACCESS_TOKEN', data.accessToken);
+                    this.router.navigate([this.returnUrl]);
                     // const roleList = data.roles;
                     // for (const role of roleList) {
                     //     if (role.authority === 'ROLE_ADMIN') {
                     //         this.returnUrl = '/admin';
                     //     }
                     // }
-                    this.router.navigate([this.returnUrl]).finally(() => {
-                    });
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 300
-                    });
-
-                    Toast.fire({
-                        type: 'success',
-                        title: 'Đăng nhập thành công'
-                    });
+                    // this.router.navigate([this.returnUrl]).finally(() => {
+                   // });
+                   //  const Toast = Swal.mixin({
+                   //      toast: true,
+                   //      position: 'top-end',
+                   //      showConfirmButton: false,
+                   //      timer: 300
+                   //  });
+                   //
+                   //  Toast.fire({
+                   //      type: 'success',
+                   //      title: 'Đăng nhập thành công'
+                   //  });
                 },
-                () => {
+                error => {
                     this.loading = false;
                     // tslint:disable-next-line:only-arrow-functions
-                    $(function () {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000
-                        });
-
-                        Toast.fire({
-                            type: 'error',
-                            title: 'Đăng nhập thất bại'
-                        });
-                    });
+                    this.error = error;
                 });
     }
 
